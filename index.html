@@ -730,7 +730,7 @@
     function formatDateCZ(d) { return d.getDate() + '. ' + (d.getMonth()+1) + '. ' + d.getFullYear(); }
     function addMinutes(time, minutes) {
       var parts = time.split(':');
-      var total = parseInt(parts[0])*60 + parseInt(parts[1]) + minutes;
+      var total = (parseInt(parts[0])*60 + parseInt(parts[1]) + minutes) % (24*60);
       return pad(Math.floor(total/60)) + ':' + pad(total%60);
     }
     function setStep(n) {
