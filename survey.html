@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html lang="cs">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>jak to bylo? ⭐</title>
+  <meta name="robots" content="noindex, nofollow" />
+  <link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,700;12..96,800&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet" />
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <style>
+    :root {
+      --bg: #0d0d0d; --surface: #161616; --surface2: #1f1f1f;
+      --border: #2a2a2a; --text: #f0ece3; --muted: #6b6b6b;
+      --accent1: #ff5c3a; --accent2: #c8ff3e; --accent3: #a78bfa; --accent4: #38bdf8;
+      --font-display: 'Bricolage Grotesque', sans-serif;
+      --font-body: 'DM Sans', sans-serif;
+    }
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    body { background: var(--bg); color: var(--text); font-family: var(--font-body); min-height: 100vh; display: flex; align-items: center; justify-content: center; padding: 20px; }
+    .card { background: var(--surface); border: 1.5px solid var(--border); border-radius: 20px; padding: 40px 32px; max-width: 480px; width: 100%; text-align: center; }
+    .emoji-big { font-size: 3.5rem; display: block; margin-bottom: 16px; }
+    h1 { font-family: var(--font-display); font-size: 1.8rem; font-weight: 800; margin-bottom: 8px; }
+    .sub { color: var(--muted); font-size: 14px; margin-bottom: 28px; }
+    .stars { display: flex; justify-content: center; gap: 12px; margin-bottom: 24px; }
+    .star { font-size: 2.5rem; cursor: pointer; transition: transform 0.2s; opacity: 0.3; }
+    .star:hover, .star.active { opacity: 1; transform: scale(1.2); }
+    textarea { width: 100%; background: var(--surface2); border: 1.5px solid var(--border); border-radius: 12px; color: var(--text); font-family: var(--font-body); font-size: 14px; padding: 14px; resize: none; outline: none; min-height: 100px; }
+    textarea:focus { border-color: var(--accent3); }
+    textarea::placeholder { color: var(--muted); }
+    .submit { width: 100%; margin-top: 16px; padding: 16px; background: var(--accent4); border: none; border-radius: 12px; color: #0d0d0d; font-family: var(--font-display); font-size: 15px; font-weight: 700; cursor: pointer; transition: all 0.2s; }
+    .submit:hover { transform: scale(1.02); }
+    .submit:disabled { opacity: 0.4; cursor: not-allowed; transform: none; }
+    .success-msg { display: none; }
+    .success-msg.show { display: block; animation: pop 0.5s cubic-bezier(0.34, 1.56, 0.64, 1); }
+    @keyframes pop { from { transform: scale(0.8); opacity: 0; } to { transform: scale(1); opacity: 1; } }
+  </style>
+</head>
+<body>
+  <div class="card" id="form-card">
+    <span class="emoji-big">⭐</span>
+    <h1>jak to bylo?</h1>
+    <p class="sub" id="ref-display">loading...</p>
+
+    <div class="stars" id="stars">
+      <span class="star" data-v="1">⭐</span>
+      <span class="star" data-v="2">⭐</span>
+      <span class="star" data-v="3">⭐</span>
+      <span class="star" data-v="4">⭐</span>
+      <span class="star" data-v="5">⭐</span>
+    </div>
+
+    <textarea id="comment" placeholder="volitelný komentář... 💬" rows="4"></textarea>
+    <button class="submit" id="submit-btn" disabled>odeslat hodnocení</button>
+  </div>
+
+  <div class="card success-msg" id="success-card">
+    <span class="emoji-big">🙏</span>
+    <h1>díky!</h1>
+    <p class="sub">tvoje hodnocení jsme přijali. do příště! 👋</p>
+  </div>
+
+  <script>
+    const CONFIG = {
+      supabaseUrl: 'SUPABASE_URL_HERE',
+      supabaseKey: 'SUPABASE_ANON_KEY_HERE',
+    };
+
+    const params = new URLSearchParams(window.location.search);
+    const ref = params.get('ref') || '—';
+    document.getElementById('ref-display').textContent = `rezervace ${ref}`;
+
+    let rating = 0;
+    const stars = document.querySelectorAll('.star');
+    stars.forEach(s => {
+      s.onclick = () => {
+        rating = parseInt(s.dataset.v);
+        stars.forEach((ss, i) => ss.classList.toggle('active', i < rating));
+        document.getElementById('submit-btn').disabled = false;
+      };
+    });
+
+    document.getElementById('submit-btn').onclick = async () => {
+      const btn = document.getElementById('submit-btn');
+      btn.disabled = true; btn.textContent = 'ukládám...';
+      try {
+        const sb = window.supabase.createClient(CONFIG.supabaseUrl, CONFIG.supabaseKey);
+        await sb.from('survey_responses').insert([{
+          ref_id: ref,
+          rating,
+          comment: document.getElementById('comment').value.trim(),
+        }]);
+      } catch(e) { console.warn(e); }
+      document.getElementById('form-card').style.display = 'none';
+      document.getElementById('success-card').classList.add('show');
+    };
+  </script>
+</body>
+</html>
