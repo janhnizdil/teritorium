@@ -302,15 +302,19 @@
     }
 
     function renderSpots(){
-      document.getElementById('spots-grid').innerHTML=SPOTS.map(s=>`
-        <div class="spot-card" data-id="${s.id}" onclick="selectSpot('${s.id}')">
-          <div class="spot-img-wrap">${s.img?`<img src="${s.img}" alt="${s.name}" loading="lazy"/>`:`<div class="spot-placeholder"><span class="spot-placeholder-emoji">${s.emoji}</span><span class="spot-placeholder-text">foto brzy</span></div>`}</div>
-          <div class="spot-info">
-            <div class="spot-name">${s.emoji} ${s.name}</div>
-            <div class="spot-meta">${s.meta}</div>
-            ${s.type==='desk'?'<span class="spot-badge">⚡ omezené aktivity</span>':''}
-          </div>
-        </div>`).join('');
+      document.getElementById('spots-grid').innerHTML=SPOTS.map(s=>{
+        const imgHtml=s.img?('<img src="'+s.img+'" alt="'+s.name+'" loading="lazy"/>'):'<div class="spot-placeholder"><span class="spot-placeholder-emoji">'+s.emoji+'</span><span class="spot-placeholder-text">foto brzy</span></div>';
+        const badgeHtml=s.type==='desk'?'<span class="spot-badge">😈 jen pro odvážné</span>':'';
+        return (
+          '<div class="spot-card" data-id="'+s.id+'" onclick="selectSpot(\'' + s.id + '\')">' +
+          '<div class="spot-img-wrap">'+imgHtml+'</div>' +
+          '<div class="spot-info">' +
+          '<div class="spot-name">'+s.emoji+' '+s.name+'</div>' +
+          '<div class="spot-meta">'+s.meta+'</div>' +
+          badgeHtml+
+          '</div></div>'
+        );
+      }).join('');
     }
 
     function selectSpot(id){
@@ -363,7 +367,7 @@
         let cls='cal-cell';
         if(isPast)cls+=' past';else if(isToday)cls+=' today';
         if(isSel)cls+=' selected';if(hasB)cls+=' has-bookings';
-        html+=`<div class="${cls}" onclick="${isPast?'':``selectDate('${ds}')``}">${d}</div>`;
+        html+='<div class="'+cls+'" '+(isPast?'':'onclick="selectDate(\''+ds+'\')"')+'>'+d+'</div>';
       }
       document.getElementById('cal-grid').innerHTML=html;
     }
@@ -383,7 +387,7 @@
         const[h,m]=t.split(':').map(Number);
         const isPast=ds===todayStr&&(h<curH||(h===curH&&m<=curM)),isBooked=occ.includes(t);
         let cls='time-slot';if(isPast||isBooked)cls+=' booked';if(state.time===t)cls+=' selected';
-        return`<div class="${cls}" onclick="${isPast||isBooked?'':``selectTime('${t}')``}">${t}</div>`;
+        return '<div class="'+cls+'" '+((isPast||isBooked)?'':'onclick="selectTime(\''+t+'\')"')+'>'+t+'</div>';
       }).join('');
     }
 
