@@ -1,151 +1,285 @@
 <!DOCTYPE html>
 <html lang="cs">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>kancl after dark 😈</title>
-  <meta name="robots" content="noindex, nofollow" />
-  <link rel="preconnect" href="https://fonts.googleapis.com" />
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-  <link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,400;12..96,600;12..96,800&family=DM+Sans:ital,wght@0,300;0,400;0,500;1,300&display=swap" rel="stylesheet" />
+  <meta name="robots" content="noindex, nofollow"/>
+  <link rel="preconnect" href="https://fonts.googleapis.com"/>
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
+  <link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,400;12..96,600;12..96,800&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet"/>
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <style>
     :root {
-      --bg:#080808;--surface:#121212;--surface2:#1c1c1c;--border:#2e2e2e;
-      --text:#f5f0e8;--text-secondary:#c8c0b4;--muted:#888;
-      --accent1:#ff2d6b;--accent2:#ff9e00;--accent3:#bf5fff;--accent4:#00e5ff;
-      --font-display:'Bricolage Grotesque',sans-serif;
-      --font-body:'DM Sans',sans-serif;
-      --radius:18px;--radius-sm:12px;
+      --bg: #080808;
+      --surface: #111;
+      --surface2: #1a1a1a;
+      --border: #282828;
+      --text: #f5f0e8;
+      --muted: #888;
+      --accent1: #ff2d6b;
+      --accent2: #ff9e00;
+      --accent3: #bf5fff;
+      --accent4: #00e5ff;
+      --font-display: 'Bricolage Grotesque', sans-serif;
+      --font-body: 'DM Sans', sans-serif;
+      --radius: 18px;
+      --radius-sm: 10px;
     }
-    *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
-    html{scroll-behavior:smooth}
-    body{background:var(--bg);color:var(--text);font-family:var(--font-body);min-height:100vh;overflow-x:hidden}
-    body::before{content:'';position:fixed;inset:0;background-image:url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='0.04'/%3E%3C/svg%3E");pointer-events:none;z-index:9999;opacity:.35}
-    .blob{position:fixed;border-radius:50%;filter:blur(90px);opacity:.1;pointer-events:none;z-index:0;animation:blobFloat 9s ease-in-out infinite alternate}
-    .blob-1{width:600px;height:600px;background:var(--accent1);top:-200px;left:-200px}
-    .blob-2{width:500px;height:500px;background:var(--accent3);bottom:-150px;right:-150px;animation-delay:3s}
-    .blob-3{width:350px;height:350px;background:var(--accent2);top:35%;left:50%;animation-delay:1.5s}
-    @keyframes blobFloat{from{transform:translate(0,0) scale(1)}to{transform:translate(25px,-25px) scale(1.04)}}
-    .container{max-width:760px;margin:0 auto;padding:0 20px 100px;position:relative;z-index:1}
-    .header{padding:64px 0 44px;text-align:center}
-    .header-tag{display:inline-flex;align-items:center;gap:6px;background:rgba(255,45,107,.14);border:1px solid rgba(255,45,107,.4);color:#ff6b9a;font-size:11px;font-weight:600;letter-spacing:.16em;text-transform:uppercase;padding:7px 16px;border-radius:100px;margin-bottom:24px}
-    .header h1{font-family:var(--font-display);font-size:clamp(2.8rem,9.5vw,4.8rem);font-weight:800;line-height:1.0;letter-spacing:-.04em;color:var(--text)}
-    .header h1 .line2{display:block;background:linear-gradient(90deg,#ff2d6b 0%,#bf5fff 60%,#ff9e00 100%);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
-    .header-sub{color:var(--text-secondary);font-size:16px;margin-top:18px;font-weight:400;line-height:1.6;max-width:420px;margin-left:auto;margin-right:auto}
-    .header-disclaimer{margin-top:14px;font-size:12px;color:var(--muted);font-style:italic}
-    .steps{display:flex;align-items:center;justify-content:center;gap:8px;margin-bottom:44px}
-    .step-dot{width:8px;height:8px;border-radius:50%;background:var(--border);transition:all .3s ease}
-    .step-dot.active{background:var(--accent2);width:28px;border-radius:4px}
-    .step-dot.done{background:var(--accent2);opacity:.35}
-    .section-label{font-family:var(--font-display);font-size:11px;font-weight:700;letter-spacing:.15em;text-transform:uppercase;color:var(--text-secondary);margin-bottom:16px;display:flex;align-items:center;gap:12px}
-    .section-label::after{content:'';flex:1;height:1px;background:var(--border)}
-    .cards-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:14px;margin-bottom:40px}
-    .spot-card{background:var(--surface);border:1.5px solid var(--border);border-radius:var(--radius);cursor:pointer;transition:all .25s cubic-bezier(.34,1.56,.64,1);overflow:hidden;position:relative}
-    .spot-card:hover{border-color:var(--accent1);transform:translateY(-5px) scale(1.01);box-shadow:0 16px 48px rgba(255,45,107,.18)}
-    .spot-card.selected{border-color:var(--accent2);box-shadow:0 0 0 3px rgba(255,158,0,.2),0 12px 40px rgba(255,158,0,.12)}
-    .spot-card.selected::after{content:'✓';position:absolute;top:10px;right:10px;background:var(--accent2);color:#000;width:24px;height:24px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:800;z-index:2}
-    .spot-img-wrap{width:100%;aspect-ratio:16/10;background:var(--surface2);overflow:hidden}
-    .spot-img-wrap img{width:100%;height:100%;object-fit:cover;transition:transform .4s ease}
-    .spot-card:hover .spot-img-wrap img{transform:scale(1.07)}
-    .spot-placeholder{width:100%;height:100%;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:8px;background:linear-gradient(135deg,#1c1c1c 0%,#242424 100%)}
-    .spot-placeholder-emoji{font-size:2.4rem}
-    .spot-placeholder-text{font-size:10px;color:var(--muted);letter-spacing:.1em;text-transform:uppercase}
-    .spot-info{padding:14px 16px 16px}
-    .spot-name{font-family:var(--font-display);font-weight:700;font-size:15px;margin-bottom:4px;color:var(--text)}
-    .spot-meta{font-size:12px;color:var(--text-secondary)}
-    .spot-badge{display:inline-flex;align-items:center;gap:4px;background:rgba(191,95,255,.14);border:1px solid rgba(191,95,255,.32);color:#d08fff;font-size:10px;font-weight:600;padding:3px 9px;border-radius:100px;margin-top:7px}
-    .activity-section{margin-bottom:40px;display:none;animation:slideUp .4s cubic-bezier(.34,1.56,.64,1)}
-    .activity-section.visible{display:block}
-    @keyframes slideUp{from{opacity:0;transform:translateY(22px)}to{opacity:1;transform:translateY(0)}}
-    .activity-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:10px}
-    .activity-btn{background:var(--surface);border:1.5px solid var(--border);border-radius:var(--radius-sm);padding:20px 18px;cursor:pointer;text-align:left;transition:all .22s cubic-bezier(.34,1.56,.64,1);color:var(--text);font-family:var(--font-body);display:flex;flex-direction:column;gap:5px}
-    .activity-btn:hover{border-color:var(--accent3);transform:scale(1.02);background:rgba(191,95,255,.07)}
-    .activity-btn.selected{border-color:var(--accent2);background:rgba(255,158,0,.07);box-shadow:0 0 0 3px rgba(255,158,0,.14)}
-    .activity-btn.disabled{opacity:.22;cursor:not-allowed;pointer-events:none}
-    .activity-emoji{font-size:1.8rem}
-    .activity-name{font-size:14px;font-weight:600;color:var(--text)}
-    .activity-desc{font-size:12px;color:var(--text-secondary);line-height:1.4}
-    .custom-input-wrap{margin-top:12px;display:none}
-    .custom-input-wrap.visible{display:block;animation:slideUp .3s ease}
-    .custom-textarea{width:100%;background:var(--surface2);border:1.5px solid var(--border);border-radius:var(--radius-sm);color:var(--text);font-family:var(--font-body);font-size:14px;padding:14px 16px;resize:none;outline:none;min-height:90px;transition:border-color .2s}
-    .custom-textarea:focus{border-color:var(--accent3)}
-    .custom-textarea::placeholder{color:var(--muted)}
-    .calendar-section{margin-bottom:40px;display:none;animation:slideUp .4s cubic-bezier(.34,1.56,.64,1)}
-    .calendar-section.visible{display:block}
-    .cal-card{background:var(--surface);border:1.5px solid var(--border);border-radius:var(--radius);overflow:hidden}
-    .cal-header{display:flex;align-items:center;justify-content:space-between;padding:20px 24px 16px;border-bottom:1px solid var(--border)}
-    .cal-title{font-family:var(--font-display);font-weight:700;font-size:18px;color:var(--text)}
-    .cal-nav{display:flex;gap:6px}
-    .cal-nav-btn{width:36px;height:36px;background:var(--surface2);border:1px solid var(--border);border-radius:9px;color:var(--text);cursor:pointer;display:flex;align-items:center;justify-content:center;font-size:15px;transition:all .2s}
-    .cal-nav-btn:hover{background:var(--border)}
-    .cal-days-header{display:grid;grid-template-columns:repeat(7,1fr);padding:14px 16px 8px}
-    .cal-day-label{text-align:center;font-size:10px;font-weight:600;text-transform:uppercase;letter-spacing:.08em;color:var(--muted)}
-    .cal-grid{display:grid;grid-template-columns:repeat(7,1fr);gap:4px;padding:0 16px 20px}
-    .cal-cell{aspect-ratio:1;display:flex;align-items:center;justify-content:center;border-radius:9px;font-size:13px;font-weight:500;cursor:pointer;transition:all .15s;position:relative;border:1.5px solid transparent;color:var(--text)}
-    .cal-cell:not(.empty):not(.past):hover{background:var(--surface2);border-color:var(--accent3);color:#d08fff}
-    .cal-cell.today{border-color:var(--accent1);color:#ff6b9a;font-weight:700}
-    .cal-cell.selected{background:var(--accent2);color:#000;font-weight:800;border-color:var(--accent2)}
-    .cal-cell.past{color:#3a3a3a;cursor:default}
-    .cal-cell.empty{cursor:default}
-    .cal-cell.has-bookings::after{content:'';position:absolute;bottom:3px;left:50%;transform:translateX(-50%);width:4px;height:4px;background:var(--accent1);border-radius:50%}
-    .cal-cell.selected.has-bookings::after{background:#000}
-    .time-section{display:none;animation:slideUp .35s ease}
-    .time-section.visible{display:block}
-    .time-header{padding:16px 24px 12px;border-top:1px solid var(--border)}
-    .time-title{font-size:13px;font-weight:500;color:var(--text-secondary);margin-bottom:12px}
-    .time-slots{display:flex;flex-wrap:wrap;gap:8px;padding:0 24px 20px}
-    .time-slot{padding:8px 14px;background:var(--surface2);border:1.5px solid var(--border);border-radius:8px;font-size:13px;font-weight:500;cursor:pointer;transition:all .18s;color:var(--text)}
-    .time-slot:hover{border-color:var(--accent3);color:#d08fff}
-    .time-slot.selected{background:var(--accent2);color:#000;border-color:var(--accent2);font-weight:700}
-    .time-slot.booked{opacity:.25;cursor:not-allowed;text-decoration:line-through;color:var(--muted)}
-    .duration-wrap{padding:0 24px 22px;display:none}
-    .duration-wrap.visible{display:block;animation:slideUp .3s ease}
-    .duration-label{font-size:13px;color:var(--text-secondary);margin-bottom:10px;font-weight:500}
-    .duration-slots{display:flex;gap:8px;flex-wrap:wrap}
-    .duration-btn{padding:8px 16px;background:var(--surface2);border:1.5px solid var(--border);border-radius:8px;font-size:13px;font-weight:500;cursor:pointer;transition:all .18s;color:var(--text)}
-    .duration-btn:hover{border-color:var(--accent4);color:var(--accent4)}
-    .duration-btn.selected{background:var(--accent4);color:#000;border-color:var(--accent4);font-weight:700}
-    .contact-section{display:none;animation:slideUp .4s cubic-bezier(.34,1.56,.64,1);margin-bottom:40px}
-    .contact-section.visible{display:block}
-    .form-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px}
-    .form-field{display:flex;flex-direction:column;gap:7px}
-    .form-field.full{grid-column:1/-1}
-    .form-label{font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.12em;color:var(--text-secondary)}
-    .form-input{background:var(--surface);border:1.5px solid var(--border);border-radius:var(--radius-sm);color:var(--text);font-family:var(--font-body);font-size:14px;padding:13px 15px;outline:none;transition:border-color .2s}
-    .form-input:focus{border-color:var(--accent3)}
-    .form-input::placeholder{color:var(--muted)}
-    .summary-section{display:none;animation:slideUp .4s cubic-bezier(.34,1.56,.64,1);margin-bottom:32px}
-    .summary-section.visible{display:block}
-    .summary-card{background:var(--surface);border:1.5px solid var(--border);border-radius:var(--radius);padding:24px}
-    .summary-title{font-family:var(--font-display);font-size:17px;font-weight:700;color:var(--text);margin-bottom:18px}
-    .summary-row{display:flex;justify-content:space-between;align-items:flex-start;padding:10px 0;border-bottom:1px solid var(--border);font-size:14px}
-    .summary-row:last-child{border-bottom:none}
-    .summary-row-key{color:var(--text-secondary)}
-    .summary-row-val{font-weight:600;color:var(--text);text-align:right;max-width:60%}
-    .submit-btn{width:100%;padding:19px;background:linear-gradient(90deg,#ff2d6b,#bf5fff);border:none;border-radius:var(--radius);color:#fff;font-family:var(--font-display);font-size:17px;font-weight:800;cursor:pointer;transition:all .25s cubic-bezier(.34,1.56,.64,1);display:flex;align-items:center;justify-content:center;gap:10px}
-    .submit-btn:hover{transform:scale(1.02) translateY(-2px);box-shadow:0 16px 48px rgba(255,45,107,.35)}
-    .submit-btn:active{transform:scale(.98)}
-    .submit-btn.loading{opacity:.7;pointer-events:none}
-    .btn-spinner{width:18px;height:18px;border:2px solid rgba(255,255,255,.35);border-top-color:#fff;border-radius:50%;animation:spin .7s linear infinite;display:none}
-    .submit-btn.loading .btn-spinner{display:block}
-    .submit-btn.loading .btn-text{display:none}
-    @keyframes spin{to{transform:rotate(360deg)}}
-    #success-screen{display:none;text-align:center;padding:70px 20px;animation:slideUp .5s cubic-bezier(.34,1.56,.64,1)}
-    #success-screen.visible{display:block}
-    .success-emoji{font-size:5.5rem;display:block;margin-bottom:20px;animation:bounceIn .6s cubic-bezier(.34,1.56,.64,1)}
-    @keyframes bounceIn{from{transform:scale(0);opacity:0}to{transform:scale(1);opacity:1}}
-    .success-title{font-family:var(--font-display);font-size:2.5rem;font-weight:800;margin-bottom:12px;color:var(--text)}
-    .success-sub{color:var(--text-secondary);font-size:15px;line-height:1.7}
-    .success-ref{margin-top:20px;display:inline-block;background:var(--surface2);border:1px solid var(--border);border-radius:100px;padding:8px 22px;font-size:13px;color:var(--muted)}
-    .success-ref span{color:var(--accent2);font-weight:700}
-    .new-booking-btn{margin-top:28px;display:inline-flex;align-items:center;gap:8px;padding:14px 28px;background:var(--surface2);border:1.5px solid var(--border);border-radius:100px;color:var(--text-secondary);font-family:var(--font-body);font-size:14px;font-weight:500;cursor:pointer;transition:all .2s}
-    .new-booking-btn:hover{border-color:var(--accent2);color:var(--accent2)}
-    .toast{position:fixed;bottom:24px;left:50%;transform:translateX(-50%) translateY(80px);background:var(--surface2);border:1.5px solid var(--border);border-radius:100px;padding:12px 26px;font-size:14px;font-weight:500;color:var(--text);box-shadow:0 8px 32px rgba(0,0,0,.6);z-index:10000;transition:transform .3s cubic-bezier(.34,1.56,.64,1);white-space:nowrap}
-    .toast.show{transform:translateX(-50%) translateY(0)}
-    .toast.error{border-color:var(--accent1);color:#ff6b9a}
-    .toast.success{border-color:var(--accent2);color:var(--accent2)}
-    @media(max-width:480px){.cards-grid{grid-template-columns:1fr 1fr}.activity-grid{grid-template-columns:1fr 1fr}.form-grid{grid-template-columns:1fr}.form-field.full{grid-column:1}}
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    html { scroll-behavior: smooth; }
+    body { background: var(--bg); color: var(--text); font-family: var(--font-body); min-height: 100vh; overflow-x: hidden; }
+
+    body::before {
+      content: '';
+      position: fixed; inset: 0;
+      background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.04'/%3E%3C/svg%3E");
+      pointer-events: none; z-index: 9999; opacity: 0.4;
+    }
+
+    .blob { position: fixed; border-radius: 50%; filter: blur(80px); opacity: 0.12; pointer-events: none; z-index: 0; animation: blobFloat 8s ease-in-out infinite alternate; }
+    .blob-1 { width: 600px; height: 600px; background: var(--accent1); top: -200px; left: -200px; animation-delay: 0s; }
+    .blob-2 { width: 450px; height: 450px; background: var(--accent3); bottom: -120px; right: -120px; animation-delay: 3s; }
+    .blob-3 { width: 350px; height: 350px; background: var(--accent2); top: 40%; left: 55%; animation-delay: 1.5s; }
+    @keyframes blobFloat { from { transform: translate(0,0) scale(1); } to { transform: translate(30px,-30px) scale(1.05); } }
+
+    .container { max-width: 780px; margin: 0 auto; padding: 0 20px 80px; position: relative; z-index: 1; }
+
+    .header { padding: 60px 0 40px; text-align: center; }
+    .header-tag {
+      display: inline-block;
+      background: rgba(255,45,107,0.12);
+      border: 1px solid rgba(255,45,107,0.35);
+      color: #ff2d6b; font-size: 11px; letter-spacing: 0.15em;
+      text-transform: uppercase; padding: 6px 14px; border-radius: 100px;
+      margin-bottom: 20px; font-weight: 500;
+    }
+    .header h1 { font-family: var(--font-display); font-size: clamp(2.6rem,9vw,4.5rem); font-weight: 800; line-height: 1.0; letter-spacing: -0.04em; color: var(--text); }
+    .header h1 .line2 { display: block; background: linear-gradient(90deg,#ff2d6b,#bf5fff); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text; }
+    .header-sub { color: #bbb; font-size: 16px; margin-top: 12px; font-weight: 300; }
+    .header-sub2 { color: #999; font-size: 14px; margin-top: 8px; font-style: normal; letter-spacing: 0.01em; }
+
+    .steps { display: flex; align-items: center; justify-content: center; gap: 8px; margin-bottom: 40px; }
+    .step-dot { width: 8px; height: 8px; border-radius: 50%; background: var(--border); transition: all 0.3s ease; }
+    .step-dot.active { background: var(--accent2); width: 24px; border-radius: 4px; }
+    .step-dot.done { background: var(--accent2); opacity: 0.4; }
+
+    .section-label {
+      font-family: var(--font-display); font-size: 11px; letter-spacing: 0.14em;
+      text-transform: uppercase; color: #999; margin-bottom: 16px;
+      display: flex; align-items: center; gap: 10px; font-weight: 600;
+    }
+    .section-label::after { content: ''; flex: 1; height: 1px; background: var(--border); }
+
+    .cards-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap: 14px; margin-bottom: 40px; }
+
+    .spot-card {
+      background: var(--surface); border: 1.5px solid var(--border);
+      border-radius: var(--radius); cursor: pointer;
+      transition: all 0.25s cubic-bezier(0.34,1.56,0.64,1); overflow: hidden; position: relative;
+    }
+    .spot-card:hover { border-color: var(--accent1); transform: translateY(-4px) scale(1.01); box-shadow: 0 12px 40px rgba(255,45,107,0.18); }
+    .spot-card.selected { border-color: var(--accent2); box-shadow: 0 0 0 3px rgba(255,158,0,0.18), 0 12px 40px rgba(255,158,0,0.12); }
+    .spot-card.selected::after {
+      content: '✓'; position: absolute; top: 10px; right: 10px;
+      background: var(--accent2); color: #000; width: 24px; height: 24px;
+      border-radius: 50%; display: flex; align-items: center; justify-content: center;
+      font-size: 12px; font-weight: 800; z-index: 2;
+    }
+    .spot-img-wrap { width: 100%; aspect-ratio: 16/10; background: var(--surface2); overflow: hidden; }
+    .spot-img-wrap img { width: 100%; height: 100%; object-fit: cover; transition: transform 0.4s ease; }
+    .spot-card:hover .spot-img-wrap img { transform: scale(1.07); }
+    .spot-placeholder { width: 100%; height: 100%; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 8px; background: linear-gradient(135deg, var(--surface2) 0%, #222 100%); }
+    .spot-placeholder-emoji { font-size: 2.4rem; }
+    .spot-placeholder-text { font-size: 10px; color: var(--muted); letter-spacing: 0.1em; text-transform: uppercase; }
+    .spot-info { padding: 14px 16px 16px; }
+    .spot-name { font-family: var(--font-display); font-weight: 700; font-size: 15px; margin-bottom: 4px; color: var(--text); }
+    .spot-meta { font-size: 12px; color: #aaa; }
+    .spot-badge { display: inline-flex; align-items: center; gap: 4px; background: rgba(191,95,255,0.14); border: 1px solid rgba(191,95,255,0.3); color: #bf5fff; font-size: 10px; padding: 3px 8px; border-radius: 100px; margin-top: 6px; font-weight: 500; }
+
+    .activity-section { margin-bottom: 40px; display: none; animation: slideUp 0.4s cubic-bezier(0.34,1.56,0.64,1); }
+    .activity-section.visible { display: block; }
+    @keyframes slideUp { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
+
+    .activity-grid { display: grid; grid-template-columns: repeat(2,1fr); gap: 10px; }
+    .activity-btn {
+      background: var(--surface); border: 1.5px solid var(--border);
+      border-radius: var(--radius-sm); padding: 20px 16px; cursor: pointer;
+      text-align: left; transition: all 0.2s cubic-bezier(0.34,1.56,0.64,1);
+      color: var(--text); font-family: var(--font-body); display: flex; flex-direction: column; gap: 5px;
+    }
+    .activity-btn:hover { border-color: var(--accent3); transform: scale(1.02); background: rgba(191,95,255,0.07); }
+    .activity-btn.selected { border-color: var(--accent2); background: rgba(255,158,0,0.07); box-shadow: 0 0 0 3px rgba(255,158,0,0.13); }
+    .activity-btn.disabled { opacity: 0.2; cursor: not-allowed; pointer-events: none; }
+    .activity-emoji { font-size: 1.8rem; }
+    .activity-name { font-size: 15px; font-weight: 600; color: var(--text); }
+    .activity-desc { font-size: 12px; color: #aaa; }
+
+    .custom-input-wrap { margin-top: 12px; display: none; }
+    .custom-input-wrap.visible { display: block; animation: slideUp 0.3s ease; }
+    .custom-textarea { width: 100%; background: var(--surface2); border: 1.5px solid var(--border); border-radius: var(--radius-sm); color: var(--text); font-family: var(--font-body); font-size: 14px; padding: 14px 16px; resize: none; outline: none; min-height: 90px; transition: border-color 0.2s; }
+    .custom-textarea:focus { border-color: var(--accent3); }
+    .custom-textarea::placeholder { color: #555; }
+
+    .calendar-section { margin-bottom: 40px; display: none; animation: slideUp 0.4s cubic-bezier(0.34,1.56,0.64,1); }
+    .calendar-section.visible { display: block; }
+
+    .cal-card { background: var(--surface); border: 1.5px solid var(--border); border-radius: var(--radius); overflow: hidden; }
+    .cal-header { display: flex; align-items: center; justify-content: space-between; padding: 20px 24px 16px; border-bottom: 1px solid var(--border); }
+    .cal-title { font-family: var(--font-display); font-weight: 700; font-size: 18px; color: var(--text); }
+    .cal-nav { display: flex; gap: 6px; }
+    .cal-nav-btn { width: 34px; height: 34px; background: var(--surface2); border: 1px solid var(--border); border-radius: 8px; color: var(--text); cursor: pointer; display: flex; align-items: center; justify-content: center; font-size: 14px; transition: all 0.2s; }
+    .cal-nav-btn:hover { background: #333; }
+    .cal-days-header { display: grid; grid-template-columns: repeat(7,1fr); padding: 12px 16px 8px; }
+    .cal-day-label { text-align: center; font-size: 11px; text-transform: uppercase; letter-spacing: 0.08em; color: #999; font-weight: 600; }
+    .cal-grid { display: grid; grid-template-columns: repeat(7,1fr); gap: 4px; padding: 0 16px 20px; }
+    .cal-cell { aspect-ratio: 1; display: flex; align-items: center; justify-content: center; border-radius: 8px; font-size: 13px; cursor: pointer; transition: all 0.15s; position: relative; border: 1.5px solid transparent; color: var(--text); }
+    .cal-cell.available:hover { background: rgba(191,95,255,0.12); border-color: var(--accent3); color: #bf5fff; }
+    .cal-cell.today { border-color: var(--accent1); color: var(--accent1); font-weight: 700; }
+    .cal-cell.selected { background: var(--accent1); color: #fff; font-weight: 700; border-color: var(--accent1); }
+    .cal-cell.past { color: #333; cursor: default; }
+    .cal-cell.empty { cursor: default; }
+    .cal-cell.has-bookings::after { content: ''; position: absolute; bottom: 3px; left: 50%; transform: translateX(-50%); width: 4px; height: 4px; background: var(--accent2); border-radius: 50%; }
+
+    .time-section { display: none; animation: slideUp 0.35s ease; }
+    .time-section.visible { display: block; }
+    .time-header { padding: 16px 24px 12px; border-top: 1px solid var(--border); }
+    .time-title { font-size: 13px; font-weight: 600; color: #ccc; margin-bottom: 12px; }
+    .time-slots { display: flex; flex-wrap: wrap; gap: 8px; padding: 0 24px 20px; }
+    .time-slot { padding: 8px 14px; background: var(--surface2); border: 1.5px solid var(--border); border-radius: 8px; font-size: 13px; cursor: pointer; transition: all 0.2s; color: #ddd; }
+    .time-slot:hover { border-color: var(--accent3); color: #bf5fff; background: rgba(191,95,255,0.08); }
+    .time-slot.selected { background: var(--accent1); color: #fff; border-color: var(--accent1); font-weight: 600; }
+    .time-slot.booked { opacity: 0.25; cursor: not-allowed; text-decoration: line-through; color: #555; pointer-events: none; }
+
+    .duration-wrap { padding: 0 24px 20px; display: none; }
+    .duration-wrap.visible { display: block; animation: slideUp 0.3s ease; }
+    .duration-label { font-size: 13px; color: #ccc; margin-bottom: 10px; font-weight: 500; }
+    .duration-slots { display: flex; gap: 8px; flex-wrap: wrap; }
+    .duration-btn { padding: 8px 16px; background: var(--surface2); border: 1.5px solid var(--border); border-radius: 8px; font-size: 13px; cursor: pointer; transition: all 0.2s; color: #ddd; }
+    .duration-btn:hover { border-color: var(--accent4); color: var(--accent4); background: rgba(0,229,255,0.07); }
+    .duration-btn.selected { background: var(--accent4); color: #000; border-color: var(--accent4); font-weight: 700; }
+
+    .contact-section { display: none; animation: slideUp 0.4s cubic-bezier(0.34,1.56,0.64,1); margin-bottom: 40px; }
+    .contact-section.visible { display: block; }
+    .form-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+    .form-field { display: flex; flex-direction: column; gap: 6px; }
+    .form-label { font-size: 11px; text-transform: uppercase; letter-spacing: 0.1em; color: #aaa; font-weight: 600; }
+    .form-input { background: var(--surface); border: 1.5px solid var(--border); border-radius: var(--radius-sm); color: var(--text); font-family: var(--font-body); font-size: 15px; padding: 13px 14px; outline: none; transition: border-color 0.2s; }
+    .form-input:focus { border-color: var(--accent3); box-shadow: 0 0 0 3px rgba(191,95,255,0.1); }
+    .form-input::placeholder { color: #444; }
+
+    .summary-section { display: none; animation: slideUp 0.4s cubic-bezier(0.34,1.56,0.64,1); margin-bottom: 40px; }
+    .summary-section.visible { display: block; }
+    .summary-card { background: var(--surface); border: 1.5px solid var(--border); border-radius: var(--radius); padding: 24px; }
+    .summary-title { font-family: var(--font-display); font-size: 18px; font-weight: 700; margin-bottom: 20px; color: var(--text); }
+    .summary-row { display: flex; justify-content: space-between; align-items: flex-start; padding: 10px 0; border-bottom: 1px solid var(--border); font-size: 14px; }
+    .summary-row:last-child { border-bottom: none; }
+    .summary-row-key { color: #999; }
+    .summary-row-val { font-weight: 500; text-align: right; max-width: 60%; color: var(--text); }
+
+    .submit-btn {
+      width: 100%; padding: 18px;
+      background: linear-gradient(135deg, #ff2d6b, #bf5fff);
+      border: none; border-radius: var(--radius); color: #fff;
+      font-family: var(--font-display); font-size: 17px; font-weight: 800;
+      cursor: pointer; transition: all 0.25s cubic-bezier(0.34,1.56,0.64,1);
+      display: flex; align-items: center; justify-content: center; gap: 10px;
+    }
+    .submit-btn:hover { transform: scale(1.02); box-shadow: 0 12px 40px rgba(255,45,107,0.4); }
+    .submit-btn:active { transform: scale(0.98); }
+    .submit-btn:disabled { opacity: 0.4; cursor: not-allowed; transform: none; box-shadow: none; }
+    .submit-btn.loading { opacity: 0.7; pointer-events: none; }
+    .btn-spinner { width: 18px; height: 18px; border: 2px solid rgba(255,255,255,0.3); border-top-color: #fff; border-radius: 50%; animation: spin 0.7s linear infinite; display: none; }
+    .submit-btn.loading .btn-spinner { display: block; }
+    .submit-btn.loading .btn-text { display: none; }
+    @keyframes spin { to { transform: rotate(360deg); } }
+
+    #success-screen { display: none; text-align: center; padding: 60px 20px; animation: slideUp 0.5s cubic-bezier(0.34,1.56,0.64,1); }
+    #success-screen.visible { display: block; }
+    .success-emoji { font-size: 5rem; display: block; margin-bottom: 20px; animation: bounceIn 0.6s cubic-bezier(0.34,1.56,0.64,1); }
+    @keyframes bounceIn { from { transform: scale(0); opacity: 0; } to { transform: scale(1); opacity: 1; } }
+    .success-title { font-family: var(--font-display); font-size: 2.2rem; font-weight: 800; margin-bottom: 12px; }
+    .success-sub { color: #aaa; font-size: 15px; line-height: 1.6; }
+    .success-ref { margin-top: 20px; display: inline-block; background: var(--surface2); border: 1px solid var(--border); border-radius: 100px; padding: 8px 20px; font-size: 13px; color: #aaa; }
+    .success-ref span { color: var(--accent2); font-weight: 600; }
+    .new-booking-btn { margin-top: 30px; display: inline-flex; align-items: center; gap: 8px; padding: 14px 28px; background: var(--surface2); border: 1.5px solid var(--border); border-radius: 100px; color: var(--text); font-family: var(--font-body); font-size: 14px; cursor: pointer; transition: all 0.2s; }
+    .new-booking-btn:hover { border-color: var(--accent2); color: var(--accent2); }
+
+    .toast { position: fixed; bottom: 24px; left: 50%; transform: translateX(-50%) translateY(80px); background: var(--surface2); border: 1.5px solid var(--border); border-radius: 100px; padding: 12px 24px; font-size: 14px; box-shadow: 0 8px 30px rgba(0,0,0,0.5); z-index: 10000; transition: transform 0.3s cubic-bezier(0.34,1.56,0.64,1); white-space: nowrap; }
+    .toast.show { transform: translateX(-50%) translateY(0); }
+    .toast.error { border-color: var(--accent1); color: var(--accent1); }
+    .toast.success { border-color: var(--accent2); color: var(--accent2); }
+
+    @media (max-width: 480px) {
+      .cards-grid { grid-template-columns: 1fr 1fr; }
+      .activity-grid { grid-template-columns: 1fr 1fr; }
+      .form-grid { grid-template-columns: 1fr; }
+    }
+
+
+    .devil {
+      display: inline-block;
+      font-style: normal;
+      font-size: 1em;
+      animation: devilPop 2s ease-in-out infinite;
+      filter: drop-shadow(0 0 10px #ff2d6b) drop-shadow(0 0 25px #ff9e00) brightness(1.2);
+    }
+    @keyframes devilPop {
+      0%,100% { transform: scale(1) rotate(-4deg); filter: drop-shadow(0 0 10px #ff2d6b) drop-shadow(0 0 25px #ff9e00) brightness(1.1); }
+      50%      { transform: scale(1.2) rotate(4deg);  filter: drop-shadow(0 0 20px #ff2d6b) drop-shadow(0 0 50px #ff9e00) brightness(1.3); }
+    }
+
+    /* ── SEXY DURATION BUTTONS ── */
+    @keyframes flamePulse {
+      0%   { box-shadow: 0 0 8px #ff2d6b, 0 0 20px #ff2d6b, 0 0 40px #ff9e00; transform: scale(1); }
+      50%  { box-shadow: 0 0 16px #ff2d6b, 0 0 40px #ff9e00, 0 0 60px #ff2d6b; transform: scale(1.03); }
+      100% { box-shadow: 0 0 8px #ff2d6b, 0 0 20px #ff2d6b, 0 0 40px #ff9e00; transform: scale(1); }
+    }
+    @keyframes drip {
+      0%   { box-shadow: 0 0 8px #00e5ff, 0 0 20px #00e5ff, 0 4px 20px #00e5ff; transform: scale(1) translateY(0); }
+      40%  { box-shadow: 0 0 20px #00e5ff, 0 0 50px #00e5ff, 0 8px 40px #00e5ff; transform: scale(1.02) translateY(1px); }
+      100% { box-shadow: 0 0 8px #00e5ff, 0 0 20px #00e5ff, 0 4px 20px #00e5ff; transform: scale(1) translateY(0); }
+    }
+    @keyframes shake {
+      0%,100% { transform: translateX(0) rotate(0deg); }
+      15%  { transform: translateX(-3px) rotate(-1deg); }
+      30%  { transform: translateX(3px) rotate(1deg); }
+      45%  { transform: translateX(-2px) rotate(-0.5deg); }
+      60%  { transform: translateX(2px) rotate(0.5deg); }
+      75%  { transform: translateX(-1px); }
+    }
+    .duration-btn.fire {
+      background: linear-gradient(135deg, #ff2d6b, #ff9e00) !important;
+      color: #fff !important;
+      border-color: #ff2d6b !important;
+      font-weight: 700;
+      animation: flamePulse 1.8s ease-in-out infinite, shake 2.5s ease-in-out infinite;
+      position: relative;
+    }
+    .duration-btn.fire::before {
+      content: '🔥';
+      margin-right: 4px;
+    }
+    .duration-btn.fire.selected {
+      animation: flamePulse 0.8s ease-in-out infinite, shake 1s ease-in-out infinite;
+    }
+    .duration-btn.drip {
+      background: rgba(0,229,255,0.1) !important;
+      color: #00e5ff !important;
+      border-color: #00e5ff !important;
+      font-weight: 700;
+      animation: drip 2s ease-in-out infinite;
+      position: relative;
+    }
+    .duration-btn.drip::before {
+      content: '💦';
+      margin-right: 4px;
+    }
+    .duration-btn.drip.selected {
+      background: #00e5ff !important;
+      color: #000 !important;
+      animation: drip 0.8s ease-in-out infinite;
+    }
   </style>
 </head>
 <body>
@@ -155,14 +289,15 @@
 
   <div id="main-screen">
     <div class="container">
+
       <div class="header">
-        <div class="header-tag">🔒 jen pro ty, co mají link</div>
-        <h1>obsaď teritorium<span class="line2">😈 after dark</span></h1>
-        <p class="header-sub">kancl je volný. ty víš co chceš. my se neptáme. 👀</p>
-        <p class="header-disclaimer">co se děje v kanclu, zůstane v kanclu 🤐</p>
+        <div class="header-tag">🔒 jen pro zasvěcené · tajná mise</div>
+        <h1>obsaď si své teritorium!<span class="line2">kde na to máš chuť? <span class="devil">🍑</span></span></h1>
+        <p class="header-sub">místo je volný. počkám tam na tebe 👀</p>
+        <p class="header-sub2">nikdo se neptá. nikdo neví. jen ty a já. 🤫</p>
       </div>
 
-      <div class="steps">
+      <div class="steps" id="steps">
         <div class="step-dot active" id="step-1"></div>
         <div class="step-dot" id="step-2"></div>
         <div class="step-dot" id="step-3"></div>
@@ -170,40 +305,45 @@
       </div>
 
       <div id="section-spots">
-        <div class="section-label">01 — vyber si místo 📍</div>
+        <div class="section-label">01 — vyber svůj terén 🗺️</div>
         <div class="cards-grid" id="spots-grid"></div>
       </div>
 
       <div class="activity-section" id="section-activity">
-        <div class="section-label">02 — co tam budeš dělat 👀</div>
+        <div class="section-label">02 — a co tam budeš provádět 👀</div>
         <div class="activity-grid" id="activity-grid"></div>
         <div class="custom-input-wrap" id="custom-input-wrap">
-          <textarea class="custom-textarea" id="custom-request" placeholder="řekni nám víc... jen mezi námi 🤫" rows="3"></textarea>
+          <textarea class="custom-textarea" id="custom-request" placeholder="popiš svou tajnou misi... nebo nechej vše na mně a nech se překvapit 😈" rows="3"></textarea>
         </div>
       </div>
 
       <div class="calendar-section" id="section-calendar">
-        <div class="section-label">03 — kdy přijdeš 📅</div>
+        <div class="section-label">03 — kdy se to stane 🗓️</div>
         <div class="cal-card">
           <div class="cal-header">
             <div class="cal-title" id="cal-month-label">—</div>
             <div class="cal-nav">
-              <button class="cal-nav-btn" id="cal-prev">&#8249;</button>
-              <button class="cal-nav-btn" id="cal-next">&#8250;</button>
+              <button class="cal-nav-btn" id="cal-prev">‹</button>
+              <button class="cal-nav-btn" id="cal-next">›</button>
             </div>
           </div>
           <div class="cal-days-header">
-            <div class="cal-day-label">Po</div><div class="cal-day-label">Út</div>
-            <div class="cal-day-label">St</div><div class="cal-day-label">Čt</div>
-            <div class="cal-day-label">Pá</div><div class="cal-day-label">So</div>
+            <div class="cal-day-label">Po</div>
+            <div class="cal-day-label">Út</div>
+            <div class="cal-day-label">St</div>
+            <div class="cal-day-label">Čt</div>
+            <div class="cal-day-label">Pá</div>
+            <div class="cal-day-label">So</div>
             <div class="cal-day-label">Ne</div>
           </div>
           <div class="cal-grid" id="cal-grid"></div>
           <div class="time-section" id="time-section">
-            <div class="time-header"><div class="time-title">od kolik? 🕐</div></div>
+            <div class="time-header">
+              <div class="time-title">od kolika? 🕐</div>
+            </div>
             <div class="time-slots" id="time-slots-grid"></div>
             <div class="duration-wrap" id="duration-wrap">
-              <div class="duration-label">jak dlouho? ⏱️</div>
+              <div class="duration-label">a jak dlouho to potrvá? 😏</div>
               <div class="duration-slots" id="duration-slots-grid"></div>
             </div>
           </div>
@@ -211,11 +351,11 @@
       </div>
 
       <div class="contact-section" id="section-contact">
-        <div class="section-label">04 — kdo jsi 👤</div>
+        <div class="section-label">04 — kdo za tím stojí 🫦</div>
         <div class="form-grid">
           <div class="form-field">
             <label class="form-label" for="field-name">jméno</label>
-            <input class="form-input" type="text" id="field-name" placeholder="tvoje jméno" autocomplete="name"/>
+            <input class="form-input" type="text" id="field-name" placeholder="jak ti mám říkat..." autocomplete="name"/>
           </div>
           <div class="form-field">
             <label class="form-label" for="field-email">email</label>
@@ -225,242 +365,389 @@
       </div>
 
       <div class="summary-section" id="section-summary">
-        <div class="section-label">souhrn 🔥</div>
+        <div class="section-label">souhrn mise 🔥</div>
         <div class="summary-card">
-          <div class="summary-title">tvoje mise 📋</div>
+          <div class="summary-title">📋 takže takhle to bude</div>
           <div id="summary-rows"></div>
         </div>
       </div>
 
-      <div id="submit-wrap" style="display:none;margin-top:8px">
+      <div id="submit-wrap" style="display:none; margin-top:8px;">
         <button class="submit-btn" id="submit-btn">
-          <span class="btn-text">🔒 potvrdit rezervaci</span>
+          <span class="btn-text">😈 obsadit!</span>
           <span class="btn-spinner"></span>
         </button>
       </div>
+
     </div>
   </div>
 
   <div id="success-screen" class="container">
     <span class="success-emoji" id="success-emoji">🔥</span>
-    <div class="success-title">jsi in. 😈</div>
-    <p class="success-sub">potvrzení letí na tvůj email.<br/>kancl je tvůj — nikdo se ptát nebude. 🤐</p>
+    <div class="success-title">mise zahájena! 🔥</div>
+    <p class="success-sub">potvrzení letí na mail. nic z toho nikomu neříkej. 🤫<br>dobrou zábavu! 😈</p>
     <div class="success-ref">ref: <span id="success-ref-id">—</span></div>
     <br/>
-    <button class="new-booking-btn" onclick="resetAll()">↩ nová rezervace</button>
+    <button class="new-booking-btn" onclick="resetAll()">↩ nová mise</button>
   </div>
 
   <div class="toast" id="toast"></div>
 
   <script>
-    const CONFIG={supabaseUrl:'https://pypusfkmlgvclrnsvtee.supabase.co',supabaseKey:'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InB5cHVzZmttbGd2Y2xybnN2dGVlIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzQ0MzExMTMsImV4cCI6MjA5MDAwNzExM30.y6Ff2CJ-8LxHNDMoCO8U1JVttUQlMJzrfZ6jmU8Zcic',emailFunctionUrl:'SUPABASE_EDGE_FUNCTION_URL_HERE'};
-    const SPOTS=[
-      {id:'couch-1',name:'Gauč 1',emoji:'🛋️',type:'couch',meta:'klasika, první volba',img:null},
-      {id:'couch-2',name:'Gauč 2',emoji:'🛋️',type:'couch',meta:'u okna, city view 🌆',img:null},
-      {id:'couch-3',name:'Gauč 3',emoji:'🛋️',type:'couch',meta:'rohový, extra místo',img:null},
-      {id:'couch-4',name:'Gauč 4',emoji:'🛋️',type:'couch',meta:'nejútulnější koutek',img:null},
-      {id:'bed',name:'Postel',emoji:'🛏️',type:'bed',meta:'pro ty co to myslí vážně 😴',img:null},
-      {id:'desk',name:'Stůl',emoji:'🖥️',type:'desk',meta:'kancelářský stůl',img:null},
-    ];
-    const ACTIVITIES=[
-      {id:'sleep',emoji:'😴',name:'přenocování',desc:'zasloužený šlofík, nikdo tě nebudí 🌙',spots:['couch','bed']},
-      {id:'evening',emoji:'🔥',name:'večerní session',desc:'víš co chceš, my se neptáme 👀',spots:['couch','bed','desk']},
-      {id:'combo',emoji:'🤪',name:'full kombo!!',desc:'večer + přespání = no regrets 😝',spots:['couch','bed']},
-      {id:'other',emoji:'😈',name:'tajná mise',desc:'napiš co potřebuješ... jen mezi námi',spots:['couch','bed','desk']},
-    ];
-    const TIME_SLOTS=['08:00','08:30','09:00','09:30','10:00','10:30','11:00','11:30','12:00','12:30','13:00','13:30','14:00','14:30','15:00','15:30','16:00','16:30','17:00','17:30','18:00','18:30','19:00','19:30','20:00','20:30','21:00','21:30','22:00'];
-    const DURATIONS=[{label:'30 min',value:30},{label:'1 hod',value:60},{label:'1.5 hod',value:90},{label:'2 hod',value:120},{label:'3 hod',value:180},{label:'přes noc',value:480}];
-    let state={spot:null,activity:null,customRequest:'',date:null,time:null,duration:null,name:'',email:''};
-    let calYear,calMonth,bookedSlots={};
-    let supabase=null;
-    try{if(CONFIG.supabaseUrl!=='https://pypusfkmlgvclrnsvtee.supabase.co')supabase=window.supabase.createClient(CONFIG.supabaseUrl,CONFIG.supabaseKey)}catch(e){}
+    // CONFIG
+    var SUPABASE_URL = 'https://pypusfkmlgvclrnsvtee.supabase.co';
+    var SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InB5cHVzZmttbGd2Y2xybnN2dGVlIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzQ0MzExMTMsImV4cCI6MjA5MDAwNzExM30.y6Ff2CJ-8LxHNDMoCO8U1JVttUQlMJzrfZ6jmU8Zcic';
 
-    async function fetchBookedSlots(spotId,year,month){
-      if(!supabase)return;
-      const from=`${year}-${String(month+1).padStart(2,'0')}-01`,to=`${year}-${String(month+1).padStart(2,'0')}-31`;
-      const{data}=await supabase.from('bookings').select('date,time,duration').eq('spot_id',spotId).eq('status','confirmed').gte('date',from).lte('date',to);
-      bookedSlots={};
-      (data||[]).forEach(b=>{if(!bookedSlots[b.date])bookedSlots[b.date]=[];const si=TIME_SLOTS.indexOf(b.time),n=Math.ceil(b.duration/30);for(let i=0;i<n;i++)if(TIME_SLOTS[si+i])bookedSlots[b.date].push(TIME_SLOTS[si+i])});
+    // DATA
+    var SPOTS = [
+      {id:'couch-1', name:'Gauč 1',              emoji:'🛋️', type:'couch',    meta:'pouze od 18:00 🌙',          img:null, acts:['evening','other'], nightOnly:true},
+      {id:'couch-2', name:'Gauč 2',              emoji:'🛋️', type:'couch',    meta:'pouze od 18:00 🌙',          img:null, acts:['evening','other'], nightOnly:true},
+      {id:'couch-3', name:'Gauč 3',              emoji:'🛋️', type:'couch',    meta:'schovaný v rohu 😏',        img:null, acts:['sleep','combo','evening','other']},
+      {id:'couch-4', name:'Gauč 4',              emoji:'🛋️', type:'couch',    meta:'nejtemnější koutek 🌚',     img:null, acts:['sleep','combo','evening','other']},
+      {id:'bed',     name:'Postel',              emoji:'🛏️', type:'bed',      meta:'to pravé pro noc 🌙',       img:null, acts:['sleep','combo','evening','other']},
+      {id:'desk',    name:'Stůl',                emoji:'🖥️', type:'desk',     meta:'jen pro odvážné 😈',        img:null, acts:['evening','other']},
+      {id:'bush',    name:'Keř',                 emoji:'🌿', type:'outdoor',  meta:'na čerstvém vzduchu 🍃',    img:null, acts:['evening','other']},
+      {id:'it3',     name:'3. patro, Italská',   emoji:'🏢', type:'floor3',   meta:'výhled, klid, soukromí ✨', img:null, acts:['evening','other']},
+      {id:'wild',    name:'surprise me, daddy.', emoji:'😈', type:'wild',     meta:'místo? tajemství. 🫦',      img:null, acts:['evening','other']}
+    ];
+
+    var ACTIVITIES = [
+      {id:'sleep',   emoji:'😴', name:'nocleh šlofík',  desc:'tělo si říká dost, poslechni ho 🌙', spots:['couch','bed','floor3','outdoor']},
+      {id:'evening', emoji:'🔥', name:'session s bbc.', desc:'víš co to je 🫦',                    spots:['couch','bed','desk','outdoor','floor3','wild']},
+      {id:'combo',   emoji:'🤪', name:'full kombo',     desc:'session + šlofík, proč si vybírat',  spots:['couch','bed','floor3','outdoor']},
+      {id:'other',   emoji:'👀', name:'tajná mise',     desc:'nikdo nemusí vědět, že chceš třeba viset na háčku',                 spots:['couch','bed','desk','outdoor','floor3','wild']}
+    ];
+
+    var TIME_SLOTS = ['08:00','08:30','09:00','09:30','10:00','10:30','11:00','11:30','12:00','12:30','13:00','13:30','14:00','14:30','15:00','15:30','16:00','16:30','17:00','17:30','18:00','18:30','19:00','19:30','20:00','20:30','21:00','21:30','22:00','22:30'];
+    var DURATIONS = [{label:'RYCHLOVKA!',value:10,special:'quick'},{label:'30 min',value:30},{label:'1 hod',value:60},{label:'1.5 hod',value:90},{label:'2 hod',value:120},{label:'3 hod',value:180},{label:'CELOU NOC!',value:480,special:'night'}];
+    var CS_MONTHS = ['leden','únor','březen','duben','květen','červen','červenec','srpen','září','říjen','listopad','prosinec'];
+
+    // STATE
+    var state = {spot:null, activity:null, customRequest:'', date:null, time:null, duration:null, name:'', email:''};
+    var calYear, calMonth;
+    var bookedSlots = {};
+
+    // SUPABASE — single declaration
+    var sb = null;
+    try { sb = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY); } catch(e) { console.warn('Supabase init failed', e); }
+
+    // FETCH BOOKED SLOTS
+    function fetchBookedSlots(spotId, year, month) {
+      if (!sb) return Promise.resolve();
+      var from = year + '-' + pad(month+1) + '-01';
+      var to   = year + '-' + pad(month+1) + '-31';
+      return sb.from('bookings').select('date,time,duration').eq('spot_id', spotId).eq('status','confirmed').gte('date',from).lte('date',to)
+        .then(function(res) {
+          bookedSlots = {};
+          (res.data || []).forEach(function(b) {
+            if (!bookedSlots[b.date]) bookedSlots[b.date] = [];
+            var si = TIME_SLOTS.indexOf(b.time);
+            var n = Math.ceil(b.duration / 30);
+            for (var i = 0; i < n; i++) {
+              if (TIME_SLOTS[si+i]) bookedSlots[b.date].push(TIME_SLOTS[si+i]);
+            }
+          });
+        });
     }
 
-    async function submitBooking(){
-      const btn=document.getElementById('submit-btn');btn.classList.add('loading');
-      const ref='KNC-'+Date.now().toString(36).toUpperCase();
-      const endTime=addMinutes(state.time,state.duration);
-      const booking={ref_id:ref,spot_id:state.spot,activity:state.activity,custom_req:state.customRequest,date:formatDate(state.date),time:state.time,duration:state.duration,end_time:endTime,name:state.name,email:state.email,status:'confirmed',created_at:new Date().toISOString()};
-      if(supabase){
-        const{error}=await supabase.from('bookings').insert([booking]);
-        if(error){showToast('chyba 😬 '+error.message,'error');btn.classList.remove('loading');return}
-        try{await fetch(CONFIG.emailFunctionUrl+'/send-confirmation',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(booking)})}catch(e){}
+    // SUBMIT
+    function submitBooking() {
+      var btn = document.getElementById('submit-btn');
+      btn.classList.add('loading');
+      var ref = 'KNC-' + Date.now().toString(36).toUpperCase();
+      var endTime = addMinutes(state.time, state.duration);
+      var booking = {
+        ref_id: ref, spot_id: state.spot, activity: state.activity,
+        custom_req: state.customRequest, date: formatDate(state.date),
+        time: state.time, duration: state.duration, end_time: endTime,
+        name: state.name, email: state.email, status: 'confirmed',
+        created_at: new Date().toISOString()
+      };
+
+      function showSuccess() {
+        btn.classList.remove('loading');
+        document.getElementById('success-ref-id').textContent = ref;
+        var em = {sleep:'😴', evening:'🔥', combo:'🤪', other:'👀'};
+        document.getElementById('success-emoji').textContent = em[state.activity] || '🔥';
+        document.getElementById('main-screen').style.display = 'none';
+        document.getElementById('success-screen').classList.add('visible');
       }
-      btn.classList.remove('loading');
-      document.getElementById('success-ref-id').textContent=ref;
-      const em={sleep:'😴',evening:'🔥',combo:'🤪',other:'😈'};
-      document.getElementById('success-emoji').textContent=em[state.activity]||'🔥';
-      document.getElementById('main-screen').style.display='none';
-      document.getElementById('success-screen').classList.add('visible');
+
+      if (sb) {
+        sb.from('bookings').insert([booking]).then(function(res) {
+          if (res.error) {
+            showToast('chyba 😬 ' + res.error.message, 'error');
+            btn.classList.remove('loading');
+          } else {
+            showSuccess();
+          }
+        });
+      } else {
+        showSuccess();
+      }
     }
 
-    function renderSpots(){
-      document.getElementById('spots-grid').innerHTML=SPOTS.map(s=>{
-        const imgHtml=s.img?('<img src="'+s.img+'" alt="'+s.name+'" loading="lazy"/>'):'<div class="spot-placeholder"><span class="spot-placeholder-emoji">'+s.emoji+'</span><span class="spot-placeholder-text">foto brzy</span></div>';
-        const badgeHtml=s.type==='desk'?'<span class="spot-badge">😈 jen pro odvážné</span>':'';
-        return (
-          '<div class="spot-card" data-id="'+s.id+'" onclick="selectSpot(\'' + s.id + '\')">' +
-          '<div class="spot-img-wrap">'+imgHtml+'</div>' +
-          '<div class="spot-info">' +
-          '<div class="spot-name">'+s.emoji+' '+s.name+'</div>' +
-          '<div class="spot-meta">'+s.meta+'</div>' +
-          badgeHtml+
-          '</div></div>'
-        );
-      }).join('');
+    // RENDER SPOTS
+    function renderSpots() {
+      var html = '';
+      SPOTS.forEach(function(s) {
+        var imgHtml = s.img
+          ? '<img src="' + s.img + '" alt="' + s.name + '" loading="lazy"/>'
+          : '<div class="spot-placeholder"><span class="spot-placeholder-emoji">' + s.emoji + '</span><span class="spot-placeholder-text">foto brzy</span></div>';
+        var badge = s.type === 'desk' ? '<span class="spot-badge">😈 jen pro odvážné</span>' : '';
+        html += '<div class="spot-card" data-id="' + s.id + '" onclick="selectSpot(\'' + s.id + '\')">'
+          + '<div class="spot-img-wrap">' + imgHtml + '</div>'
+          + '<div class="spot-info">'
+          + '<div class="spot-name">' + s.emoji + ' ' + s.name + '</div>'
+          + '<div class="spot-meta">' + s.meta + '</div>'
+          + badge
+          + '</div></div>';
+      });
+      document.getElementById('spots-grid').innerHTML = html;
     }
 
-    function selectSpot(id){
-      state.spot=id;state.activity=null;
-      document.querySelectorAll('.spot-card').forEach(c=>c.classList.remove('selected'));
-      document.querySelector(`.spot-card[data-id="${id}"]`).classList.add('selected');
-      renderActivities(SPOTS.find(s=>s.id===id).type);
-      show('section-activity');hide('section-calendar');hide('section-contact');hide('section-summary');
-      document.getElementById('submit-wrap').style.display='none';
+    function selectSpot(id) {
+      state.spot = id; state.activity = null;
+      document.querySelectorAll('.spot-card').forEach(function(c) { c.classList.remove('selected'); });
+      document.querySelector('.spot-card[data-id="' + id + '"]').classList.add('selected');
+      var spot = SPOTS.find(function(s) { return s.id === id; });
+      renderActivities(spot.type);
+      document.getElementById('section-activity').classList.add('visible');
+      document.getElementById('section-calendar').classList.remove('visible');
+      document.getElementById('section-contact').classList.remove('visible');
+      document.getElementById('section-summary').classList.remove('visible');
+      document.getElementById('submit-wrap').style.display = 'none';
       document.getElementById('custom-input-wrap').classList.remove('visible');
-      setStep(2);scroll('section-activity');
+      setStep(2);
+      setTimeout(function() { document.getElementById('section-activity').scrollIntoView({behavior:'smooth',block:'nearest'}); }, 100);
     }
 
-    function renderActivities(spotType){
-      document.getElementById('activity-grid').innerHTML=ACTIVITIES.map(a=>{
-        const ok=a.spots.includes(spotType);
-        return`<button class="activity-btn${ok?'':' disabled'}" data-id="${a.id}" onclick="selectActivity('${a.id}')"${ok?'':' disabled'}><span class="activity-emoji">${a.emoji}</span><span class="activity-name">${a.name}</span><span class="activity-desc">${ok?a.desc:'nedostupné pro toto místo'}</span></button>`;
-      }).join('');
+    // RENDER ACTIVITIES
+    function renderActivities(spotType) {
+      var spot = SPOTS.find(function(s) { return s.id === state.spot; });
+      var allowed = spot && spot.acts ? spot.acts : [];
+      var html = '';
+      ACTIVITIES.forEach(function(a) {
+        var ok = allowed.indexOf(a.id) !== -1;
+        html += '<button class="activity-btn' + (ok ? '' : ' disabled') + '" data-id="' + a.id + '" onclick="selectActivity(\'' + a.id + '\')"'+ (ok ? '' : ' disabled') + '>'
+          + '<span class="activity-emoji">' + a.emoji + '</span>'
+          + '<span class="activity-name">' + a.name + '</span>'
+          + '<span class="activity-desc">' + (ok ? a.desc : 'nedostupné pro toto místo') + '</span>'
+          + '</button>';
+      });
+      document.getElementById('activity-grid').innerHTML = html;
     }
 
-    function selectActivity(id){
-      state.activity=id;
-      document.querySelectorAll('.activity-btn').forEach(b=>b.classList.remove('selected'));
-      document.querySelector(`.activity-btn[data-id="${id}"]`).classList.add('selected');
-      document.getElementById('custom-input-wrap').classList.toggle('visible',id==='other');
-      if(id!=='other')state.customRequest='';
-      const now=new Date();calYear=now.getFullYear();calMonth=now.getMonth();
-      renderCalendar();fetchBookedSlots(state.spot,calYear,calMonth).then(()=>renderCalendar());
-      show('section-calendar');hide('section-contact');hide('section-summary');
-      document.getElementById('submit-wrap').style.display='none';
-      state.date=null;state.time=null;state.duration=null;
+    function selectActivity(id) {
+      state.activity = id;
+      document.querySelectorAll('.activity-btn').forEach(function(b) { b.classList.remove('selected'); });
+      var btn = document.querySelector('.activity-btn[data-id="' + id + '"]');
+      if (btn) btn.classList.add('selected');
+      document.getElementById('custom-input-wrap').classList[id === 'other' ? 'add' : 'remove']('visible');
+      if (id !== 'other') state.customRequest = '';
+      var now = new Date();
+      calYear = now.getFullYear(); calMonth = now.getMonth();
+      renderCalendar();
+      fetchBookedSlots(state.spot, calYear, calMonth).then(function() { renderCalendar(); });
+      document.getElementById('section-calendar').classList.add('visible');
+      document.getElementById('section-contact').classList.remove('visible');
+      document.getElementById('section-summary').classList.remove('visible');
+      document.getElementById('submit-wrap').style.display = 'none';
+      state.date = null; state.time = null; state.duration = null;
       document.getElementById('time-section').classList.remove('visible');
-      setStep(3);scroll('section-calendar');
+      setStep(3);
+      setTimeout(function() { document.getElementById('section-calendar').scrollIntoView({behavior:'smooth',block:'nearest'}); }, 100);
     }
 
-    const CS_MONTHS=['leden','únor','březen','duben','květen','červen','červenec','srpen','září','říjen','listopad','prosinec'];
-
-    function renderCalendar(){
-      document.getElementById('cal-month-label').textContent=`${CS_MONTHS[calMonth]} ${calYear}`;
-      const today=new Date();today.setHours(0,0,0,0);
-      const firstDay=new Date(calYear,calMonth,1);
-      let startDow=firstDay.getDay()-1;if(startDow<0)startDow=6;
-      const dim=new Date(calYear,calMonth+1,0).getDate();
-      let html='';
-      for(let i=0;i<startDow;i++)html+=`<div class="cal-cell empty"></div>`;
-      for(let d=1;d<=dim;d++){
-        const date=new Date(calYear,calMonth,d),ds=formatDate(date);
-        const isPast=date<today,isToday=date.getTime()===today.getTime();
-        const isSel=state.date&&formatDate(state.date)===ds,hasB=bookedSlots[ds]?.length>0;
-        let cls='cal-cell';
-        if(isPast)cls+=' past';else if(isToday)cls+=' today';
-        if(isSel)cls+=' selected';if(hasB)cls+=' has-bookings';
-        html+='<div class="'+cls+'" '+(isPast?'':'onclick="selectDate(\''+ds+'\')"')+'>'+d+'</div>';
+    // CALENDAR
+    function renderCalendar() {
+      document.getElementById('cal-month-label').textContent = CS_MONTHS[calMonth] + ' ' + calYear;
+      var today = new Date(); today.setHours(0,0,0,0);
+      var firstDay = new Date(calYear, calMonth, 1);
+      var startDow = firstDay.getDay() - 1; if (startDow < 0) startDow = 6;
+      var daysInMonth = new Date(calYear, calMonth+1, 0).getDate();
+      var html = '';
+      for (var i = 0; i < startDow; i++) html += '<div class="cal-cell empty"></div>';
+      for (var d = 1; d <= daysInMonth; d++) {
+        var date = new Date(calYear, calMonth, d);
+        var ds = formatDate(date);
+        var isPast = date < today;
+        var isToday = date.getTime() === today.getTime();
+        var isSelected = state.date && formatDate(state.date) === ds;
+        var hasBookings = bookedSlots[ds] && bookedSlots[ds].length > 0;
+        var cls = 'cal-cell';
+        if (isPast) cls += ' past';
+        else { cls += ' available'; if (isToday) cls += ' today'; }
+        if (isSelected) cls += ' selected';
+        if (hasBookings) cls += ' has-bookings';
+        var onclick = isPast ? '' : ' onclick="selectDate(\'' + ds + '\')"';
+        html += '<div class="' + cls + '"' + onclick + '>' + d + '</div>';
       }
-      document.getElementById('cal-grid').innerHTML=html;
+      document.getElementById('cal-grid').innerHTML = html;
     }
 
-    function selectDate(ds){
-      state.date=new Date(ds+'T12:00:00');state.time=null;state.duration=null;
+    function selectDate(ds) {
+      state.date = new Date(ds + 'T12:00:00');
+      state.time = null; state.duration = null;
       document.getElementById('duration-wrap').classList.remove('visible');
-      renderCalendar();renderTimeSlots(ds);
+      renderCalendar();
+      renderTimeSlots(ds);
       document.getElementById('time-section').classList.add('visible');
-      hide('section-contact');hide('section-summary');
-      document.getElementById('submit-wrap').style.display='none';
+      document.getElementById('section-contact').classList.remove('visible');
+      document.getElementById('section-summary').classList.remove('visible');
+      document.getElementById('submit-wrap').style.display = 'none';
     }
 
-    function renderTimeSlots(ds){
-      const occ=bookedSlots[ds]||[],now=new Date(),todayStr=formatDate(now),curH=now.getHours(),curM=now.getMinutes();
-      document.getElementById('time-slots-grid').innerHTML=TIME_SLOTS.map(t=>{
-        const[h,m]=t.split(':').map(Number);
-        const isPast=ds===todayStr&&(h<curH||(h===curH&&m<=curM)),isBooked=occ.includes(t);
-        let cls='time-slot';if(isPast||isBooked)cls+=' booked';if(state.time===t)cls+=' selected';
-        return '<div class="'+cls+'" '+((isPast||isBooked)?'':'onclick="selectTime(\''+t+'\')"')+'>'+t+'</div>';
-      }).join('');
+    function renderTimeSlots(ds) {
+      var occupied = bookedSlots[ds] || [];
+      var now = new Date();
+      var todayStr = formatDate(now);
+      var spot = SPOTS.find(function(s) { return s.id === state.spot; });
+      var nightOnly = spot && spot.nightOnly;
+      var html = '';
+      TIME_SLOTS.forEach(function(t) {
+        var parts = t.split(':');
+        var h = parseInt(parts[0]); var m = parseInt(parts[1]);
+        // nightOnly: jen 18:00–23:30 a 00:00–05:30
+        if (nightOnly && h < 18) return;
+        var isPast = ds === todayStr && (h < now.getHours() || (h === now.getHours() && m <= now.getMinutes()));
+        var isBooked = occupied.indexOf(t) !== -1;
+        var cls = 'time-slot' + (isPast || isBooked ? ' booked' : '') + (state.time === t ? ' selected' : '');
+        var onclick = (isPast || isBooked) ? '' : ' onclick="selectTime(\'' + t + '\')"';
+        html += '<div class="' + cls + '"' + onclick + '>' + t + '</div>';
+      });
+      document.getElementById('time-slots-grid').innerHTML = html;
     }
 
-    function selectTime(t){
-      state.time=t;state.duration=null;
+    function selectTime(t) {
+      state.time = t; state.duration = null;
       document.getElementById('duration-wrap').classList.remove('visible');
-      renderTimeSlots(formatDate(state.date));renderDurationSlots();
+      renderTimeSlots(formatDate(state.date));
+      renderDurationSlots();
       document.getElementById('duration-wrap').classList.add('visible');
-      hide('section-contact');hide('section-summary');
-      document.getElementById('submit-wrap').style.display='none';
+      document.getElementById('section-contact').classList.remove('visible');
+      document.getElementById('section-summary').classList.remove('visible');
+      document.getElementById('submit-wrap').style.display = 'none';
     }
 
-    function renderDurationSlots(){
-      document.getElementById('duration-slots-grid').innerHTML=DURATIONS.map(d=>`<div class="duration-btn${state.duration===d.value?' selected':''}" onclick="selectDuration(${d.value})">${d.label}</div>`).join('');
+    function renderDurationSlots() {
+      var html = '';
+      var onlyNight = (state.activity === 'sleep' || state.activity === 'combo');
+      DURATIONS.forEach(function(d) {
+        if (onlyNight && d.special !== 'night') return;
+        var extra = '';
+        if (d.special === 'quick') extra = ' drip';
+        else if (d.special === 'night') extra = ' fire';
+        var cls = 'duration-btn' + extra + (state.duration === d.value ? ' selected' : '');
+        html += '<div class="' + cls + '" onclick="selectDuration(' + d.value + ')">' + d.label + '</div>';
+      });
+      document.getElementById('duration-slots-grid').innerHTML = html;
     }
 
-    function selectDuration(val){
-      state.duration=val;renderDurationSlots();
-      show('section-contact');setStep(4);scroll('section-contact');
-      document.getElementById('field-name').oninput=checkContactReady;
-      document.getElementById('field-email').oninput=checkContactReady;
+    function selectDuration(val) {
+      state.duration = val;
+      renderDurationSlots();
+      document.getElementById('section-contact').classList.add('visible');
+      setStep(4);
+      setTimeout(function() { document.getElementById('section-contact').scrollIntoView({behavior:'smooth',block:'nearest'}); }, 100);
+      document.getElementById('field-name').oninput = checkReady;
+      document.getElementById('field-email').oninput = checkReady;
     }
 
-    document.getElementById('cal-prev').onclick=()=>{calMonth--;if(calMonth<0){calMonth=11;calYear--}fetchBookedSlots(state.spot,calYear,calMonth).then(()=>renderCalendar())};
-    document.getElementById('cal-next').onclick=()=>{calMonth++;if(calMonth>11){calMonth=0;calYear++}fetchBookedSlots(state.spot,calYear,calMonth).then(()=>renderCalendar())};
-
-    function checkContactReady(){
-      state.name=document.getElementById('field-name').value.trim();
-      state.email=document.getElementById('field-email').value.trim();
-      if(state.activity==='other')state.customRequest=document.getElementById('custom-request').value.trim();
-      const ok=state.name&&/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(state.email);
-      if(ok){renderSummary();show('section-summary');document.getElementById('submit-wrap').style.display='block';scroll('submit-wrap')}
-      else{hide('section-summary');document.getElementById('submit-wrap').style.display='none'}
+    function checkReady() {
+      state.name  = document.getElementById('field-name').value.trim();
+      state.email = document.getElementById('field-email').value.trim();
+      if (state.activity === 'other') state.customRequest = document.getElementById('custom-request').value.trim();
+      var emailOk = /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(state.email);
+      if (state.name && emailOk) {
+        renderSummary();
+        document.getElementById('section-summary').classList.add('visible');
+        document.getElementById('submit-wrap').style.display = 'block';
+        setTimeout(function() { document.getElementById('submit-wrap').scrollIntoView({behavior:'smooth',block:'nearest'}); }, 100);
+      } else {
+        document.getElementById('section-summary').classList.remove('visible');
+        document.getElementById('submit-wrap').style.display = 'none';
+      }
     }
 
-    function renderSummary(){
-      const spot=SPOTS.find(s=>s.id===state.spot),act=ACTIVITIES.find(a=>a.id===state.activity),dur=DURATIONS.find(d=>d.value===state.duration);
-      const rows=[
-        {k:'📍 místo',v:spot?`${spot.emoji} ${spot.name}`:'—'},
-        {k:'🎯 aktivita',v:act?`${act.emoji} ${act.name}`:'—'},
-        state.customRequest?{k:'🤫 mise',v:state.customRequest}:null,
-        {k:'📅 datum',v:state.date?formatDateCZ(state.date):'—'},
-        {k:'🕐 čas',v:state.time?`${state.time} – ${addMinutes(state.time,state.duration)}`:'—'},
-        {k:'⏱️ délka',v:dur?dur.label:'—'},
-        {k:'👤 jméno',v:state.name||'—'},
-        {k:'📧 email',v:state.email||'—'},
+    function renderSummary() {
+      var spot = SPOTS.find(function(s) { return s.id === state.spot; });
+      var act  = ACTIVITIES.find(function(a) { return a.id === state.activity; });
+      var dur  = DURATIONS.find(function(d) { return d.value === state.duration; });
+      var rows = [
+        {k:'📍 místo',    v: spot ? spot.emoji + ' ' + spot.name : '—'},
+        {k:'🎯 aktivita', v: act  ? act.emoji  + ' ' + act.name  : '—'},
+        state.customRequest ? {k:'📝 požadavek', v: state.customRequest} : null,
+        {k:'📅 datum',    v: state.date ? formatDateCZ(state.date) : '—'},
+        {k:'🕐 čas',      v: state.time ? state.time + ' – ' + addMinutes(state.time, state.duration) : '—'},
+        {k:'⏱️ délka',   v: dur ? dur.label : '—'},
+        {k:'👤 jméno',    v: state.name  || '—'},
+        {k:'📧 email',    v: state.email || '—'}
       ].filter(Boolean);
-      document.getElementById('summary-rows').innerHTML=rows.map(r=>`<div class="summary-row"><span class="summary-row-key">${r.k}</span><span class="summary-row-val">${r.v}</span></div>`).join('');
+      var html = '';
+      rows.forEach(function(r) {
+        html += '<div class="summary-row"><span class="summary-row-key">' + r.k + '</span><span class="summary-row-val">' + r.v + '</span></div>';
+      });
+      document.getElementById('summary-rows').innerHTML = html;
     }
 
-    document.getElementById('submit-btn').onclick=()=>{
-      if(!state.spot||!state.activity||!state.date||!state.time||!state.duration||!state.name||!state.email){showToast('vyplň všechno prosím 👀','error');return}
-      if(state.activity==='other'&&!state.customRequest.trim()){showToast('napiš svoji misi 😈','error');return}
+    document.getElementById('cal-prev').onclick = function() {
+      calMonth--; if (calMonth < 0) { calMonth = 11; calYear--; }
+      fetchBookedSlots(state.spot, calYear, calMonth).then(function() { renderCalendar(); });
+    };
+    document.getElementById('cal-next').onclick = function() {
+      calMonth++; if (calMonth > 11) { calMonth = 0; calYear++; }
+      fetchBookedSlots(state.spot, calYear, calMonth).then(function() { renderCalendar(); });
+    };
+
+    document.getElementById('submit-btn').onclick = function() {
+      if (!state.spot || !state.activity || !state.date || !state.time || !state.duration || !state.name || !state.email) {
+        showToast('vyplň všechno, bez toho to nepůjde 😤', 'error'); return;
+      }
+      if (state.activity === 'other' && !state.customRequest.trim()) {
+        showToast('popiš svou tajnou misi 👀', 'error'); return;
+      }
       submitBooking();
     };
 
-    const show=id=>document.getElementById(id).classList.add('visible');
-    const hide=id=>document.getElementById(id).classList.remove('visible');
-    const scroll=id=>setTimeout(()=>document.getElementById(id)?.scrollIntoView({behavior:'smooth',block:'nearest'}),120);
-    const formatDate=d=>`${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`;
-    const formatDateCZ=d=>`${d.getDate()}. ${d.getMonth()+1}. ${d.getFullYear()}`;
-    function addMinutes(time,min){const[h,m]=time.split(':').map(Number),t=h*60+m+min;return`${String(Math.floor(t/60)).padStart(2,'0')}:${String(t%60).padStart(2,'0')}`}
-    function setStep(n){for(let i=1;i<=4;i++){const d=document.getElementById(`step-${i}`);d.classList.remove('active','done');if(i===n)d.classList.add('active');else if(i<n)d.classList.add('done')}}
-    function showToast(msg,type='info'){const t=document.getElementById('toast');t.textContent=msg;t.className=`toast ${type} show`;setTimeout(()=>t.classList.remove('show'),3200)}
-    function resetAll(){
-      state={spot:null,activity:null,customRequest:'',date:null,time:null,duration:null,name:'',email:''};bookedSlots={};
+    // HELPERS
+    function pad(n) { return String(n).padStart(2,'0'); }
+    function formatDate(d) { return d.getFullYear() + '-' + pad(d.getMonth()+1) + '-' + pad(d.getDate()); }
+    function formatDateCZ(d) { return d.getDate() + '. ' + (d.getMonth()+1) + '. ' + d.getFullYear(); }
+    function addMinutes(time, minutes) {
+      var parts = time.split(':');
+      var total = parseInt(parts[0])*60 + parseInt(parts[1]) + minutes;
+      return pad(Math.floor(total/60)) + ':' + pad(total%60);
+    }
+    function setStep(n) {
+      for (var i = 1; i <= 4; i++) {
+        var dot = document.getElementById('step-' + i);
+        dot.classList.remove('active','done');
+        if (i === n) dot.classList.add('active');
+        else if (i < n) dot.classList.add('done');
+      }
+    }
+    function showToast(msg, type) {
+      var t = document.getElementById('toast');
+      t.textContent = msg; t.className = 'toast ' + (type||'');
+      t.classList.add('show');
+      setTimeout(function() { t.classList.remove('show'); }, 3000);
+    }
+    function resetAll() {
+      state = {spot:null,activity:null,customRequest:'',date:null,time:null,duration:null,name:'',email:''};
+      bookedSlots = {};
       document.getElementById('success-screen').classList.remove('visible');
-      document.getElementById('main-screen').style.display='';
-      ['section-activity','section-calendar','section-contact','section-summary'].forEach(hide);
-      document.getElementById('submit-wrap').style.display='none';
-      renderSpots();setStep(1);window.scrollTo({top:0,behavior:'smooth'});
+      document.getElementById('main-screen').style.display = '';
+      document.getElementById('section-activity').classList.remove('visible');
+      document.getElementById('section-calendar').classList.remove('visible');
+      document.getElementById('section-contact').classList.remove('visible');
+      document.getElementById('section-summary').classList.remove('visible');
+      document.getElementById('submit-wrap').style.display = 'none';
+      renderSpots(); setStep(1);
+      window.scrollTo({top:0,behavior:'smooth'});
     }
 
+    // INIT
     renderSpots();
   </script>
 </body>
