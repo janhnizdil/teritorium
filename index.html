@@ -87,10 +87,11 @@
       font-size: 12px; font-weight: 800; z-index: 2;
     }
     .spot-img-wrap { width: 100%; aspect-ratio: 16/10; background: var(--surface2); overflow: hidden; }
-    .spot-img-wrap img { width: 100%; height: 100%; object-fit: cover; transition: transform 0.4s ease; }
-    .spot-card:hover .spot-img-wrap img { transform: scale(1.07); }
+    .spot-img-wrap img { width: 100%; height: 100%; object-fit: cover; transition: transform 0.4s ease, filter 0.4s ease; filter: grayscale(100%) brightness(0.85); }
+    .spot-card:hover .spot-img-wrap img { transform: scale(1.07); filter: grayscale(0%) brightness(1); }
     .spot-placeholder { width: 100%; height: 100%; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 8px; background: linear-gradient(135deg, var(--surface2) 0%, #222 100%); }
     .spot-placeholder-emoji { font-size: 2.4rem; }
+    .spot-placeholder-emoji-big { font-size: 4rem; animation: devilPop 2s ease-in-out infinite; filter: drop-shadow(0 0 12px #ff2d6b) drop-shadow(0 0 30px #bf5fff); }
     .spot-placeholder-text { font-size: 10px; color: var(--muted); letter-spacing: 0.1em; text-transform: uppercase; }
     .spot-info { padding: 14px 16px 16px; }
     .spot-name { font-family: var(--font-display); font-weight: 700; font-size: 15px; margin-bottom: 4px; color: var(--text); }
@@ -398,7 +399,7 @@
 
   <div id="success-screen" class="container">
     <span class="success-emoji" id="success-emoji">🔥</span>
-    <div class="success-title">mise zahájena! 🔥</div>
+    <div class="success-title">právě sis UDĚLAL rezervaci.<br><span style="font-size:0.65em;background:linear-gradient(90deg,#ff2d6b,#bf5fff);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;">co UDĚLÁŠ příště? 😈</span></div>
     <p class="success-sub">potvrzení letí na mail. nic z toho nikomu neříkej. 🤫<br>dobrou zábavu! 😈</p>
     <div class="success-ref">ref: <span id="success-ref-id">—</span></div>
     <br/>
@@ -422,7 +423,7 @@
       {id:'desk',    name:'Stůl',                emoji:'🖥️', type:'desk',     meta:'ten můj — přijď a uvidíš 😈',  img:null, acts:['evening','other']},
       {id:'bush',    name:'Keř',                 emoji:'🌿', type:'outdoor',  meta:'na čerstvém vzduchu 🍃',    img:null, acts:['evening','other']},
       {id:'it3',     name:'3. patro, Italská',   emoji:'🏢', type:'floor3',   meta:'klid, soukromí a prdelka na dávkovači 🍑', img:null, acts:['evening','other']},
-      {id:'wild',    name:'surprise me, daddy.', emoji:'😈', type:'wild',     meta:'místo? tajemství. 🫦',      img:null, acts:['evening','other']}
+      {id:'wild',    name:'surprise me, daddy.', emoji:'😈', type:'wild',     meta:'místo? tajemství. 🫦',      img:null, acts:['evening','other'], noPhoto:true}
     ];
 
     var ACTIVITIES = [
@@ -507,7 +508,9 @@
       SPOTS.forEach(function(s) {
         var imgHtml = s.img
           ? '<img src="' + s.img + '" alt="' + s.name + '" loading="lazy"/>'
-          : '<div class="spot-placeholder"><span class="spot-placeholder-emoji">' + s.emoji + '</span><span class="spot-placeholder-text">foto brzy</span></div>';
+          : s.noPhoto
+            ? '<div class="spot-placeholder"><span class="spot-placeholder-emoji-big">' + s.emoji + '</span></div>'
+            : '<div class="spot-placeholder"><span class="spot-placeholder-emoji">' + s.emoji + '</span><span class="spot-placeholder-text">foto brzy</span></div>';
         var badge = s.type === 'desk' ? '<span class="spot-badge">😈 jen pro odvážné</span>' : '';
         html += '<div class="spot-card" data-id="' + s.id + '" onclick="selectSpot(\'' + s.id + '\')">'
           + '<div class="spot-img-wrap">' + imgHtml + '</div>'
@@ -729,6 +732,7 @@
     function formatDate(d) { return d.getFullYear() + '-' + pad(d.getMonth()+1) + '-' + pad(d.getDate()); }
     function formatDateCZ(d) { return d.getDate() + '. ' + (d.getMonth()+1) + '. ' + d.getFullYear(); }
     function addMinutes(time, minutes) {
+      if (minutes === 480) return '06:30'; // CELOU NOC = vždy do 06:30
       var parts = time.split(':');
       var total = (parseInt(parts[0])*60 + parseInt(parts[1]) + minutes) % (24*60);
       return pad(Math.floor(total/60)) + ':' + pad(total%60);
