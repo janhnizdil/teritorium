@@ -217,6 +217,20 @@
     }
 
 
+    .devil-char {
+      display: inline-block;
+      font-style: normal;
+      font-family: "Apple Color Emoji","Segoe UI Emoji","Noto Color Emoji",sans-serif;
+      font-size: 0.8em;
+      vertical-align: middle;
+      margin-left: 4px;
+      -webkit-text-fill-color: initial;
+      background: none;
+      -webkit-background-clip: unset;
+      background-clip: unset;
+      animation: devilPop 2s ease-in-out infinite;
+      filter: drop-shadow(0 0 10px #ff2d6b) drop-shadow(0 0 25px #ff9e00);
+    }
     .devil {
       display: inline-block;
       font-style: normal;
@@ -292,7 +306,7 @@
 
       <div class="header">
         <div class="header-tag">🔒 jen pro zasvěcené · tajná mise</div>
-        <h1>obsaď si své teritorium!<span class="line2">kde na to máš chuť? <span class="devil">🍑</span></span></h1>
+        <h1>obsaď si své teritorium!<span class="line2">kde na to máš chuť? <span class="devil-char">&#x1F351;</span></span></h1>
         <p class="header-sub">místo je volný. počkám tam na tebe 👀</p>
         <p class="header-sub2">nikdo se neptá. nikdo neví. jen ty a já. 🤫</p>
       </div>
@@ -400,14 +414,14 @@
 
     // DATA
     var SPOTS = [
-      {id:'couch-1', name:'Gauč 1',              emoji:'🛋️', type:'couch',    meta:'pouze od 18:00 🌙',          img:null, acts:['evening','other'], nightOnly:true},
-      {id:'couch-2', name:'Gauč 2',              emoji:'🛋️', type:'couch',    meta:'pouze od 18:00 🌙',          img:null, acts:['evening','other'], nightOnly:true},
-      {id:'couch-3', name:'Gauč 3',              emoji:'🛋️', type:'couch',    meta:'schovaný v rohu 😏',        img:null, acts:['sleep','combo','evening','other']},
-      {id:'couch-4', name:'Gauč 4',              emoji:'🛋️', type:'couch',    meta:'nejtemnější koutek 🌚',     img:null, acts:['sleep','combo','evening','other']},
+      {id:'couch-1', name:'Gauč 1',              emoji:'🛋️', type:'couch',    meta:'Bruselská 14 — jen po setmění 🌙', img:null, acts:['evening','other'], nightOnly:true},
+      {id:'couch-2', name:'Gauč 2',              emoji:'🛋️', type:'couch',    meta:'Bruselská 14 — jen po setmění 🌙', img:null, acts:['evening','other'], nightOnly:true},
+      {id:'couch-3', name:'Gauč 3',              emoji:'🛋️', type:'couch',    meta:'Jílovská 65 — gauč + telka + ty 📺😏',        img:null, acts:['sleep','combo','evening','other']},
+      {id:'couch-4', name:'Gauč 4',              emoji:'🛋️', type:'couch',    meta:'Jílovská 65 — balkon, hvězdy, ty 🌙🍑',     img:null, acts:['sleep','combo','evening','other']},
       {id:'bed',     name:'Postel',              emoji:'🛏️', type:'bed',      meta:'to pravé pro noc 🌙',       img:null, acts:['sleep','combo','evening','other']},
-      {id:'desk',    name:'Stůl',                emoji:'🖥️', type:'desk',     meta:'jen pro odvážné 😈',        img:null, acts:['evening','other']},
+      {id:'desk',    name:'Stůl',                emoji:'🖥️', type:'desk',     meta:'ten můj — přijď a uvidíš 😈',  img:null, acts:['evening','other']},
       {id:'bush',    name:'Keř',                 emoji:'🌿', type:'outdoor',  meta:'na čerstvém vzduchu 🍃',    img:null, acts:['evening','other']},
-      {id:'it3',     name:'3. patro, Italská',   emoji:'🏢', type:'floor3',   meta:'výhled, klid, soukromí ✨', img:null, acts:['evening','other']},
+      {id:'it3',     name:'3. patro, Italská',   emoji:'🏢', type:'floor3',   meta:'klid, soukromí a prdelka na dávkovači 🍑', img:null, acts:['evening','other']},
       {id:'wild',    name:'surprise me, daddy.', emoji:'😈', type:'wild',     meta:'místo? tajemství. 🫦',      img:null, acts:['evening','other']}
     ];
 
