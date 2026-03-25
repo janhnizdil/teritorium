@@ -253,7 +253,7 @@
   <div class="toast" id="toast"></div>
 
   <script>
-    const CONFIG={supabaseUrl:'SUPABASE_URL_HERE',supabaseKey:'SUPABASE_ANON_KEY_HERE',emailFunctionUrl:'SUPABASE_EDGE_FUNCTION_URL_HERE'};
+    const CONFIG={supabaseUrl:'https://pypusfkmlgvclrnsvtee.supabase.co',supabaseKey:'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InB5cHVzZmttbGd2Y2xybnN2dGVlIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzQ0MzExMTMsImV4cCI6MjA5MDAwNzExM30.y6Ff2CJ-8LxHNDMoCO8U1JVttUQlMJzrfZ6jmU8Zcic',emailFunctionUrl:'SUPABASE_EDGE_FUNCTION_URL_HERE'};
     const SPOTS=[
       {id:'couch-1',name:'Gauč 1',emoji:'🛋️',type:'couch',meta:'klasika, první volba',img:null},
       {id:'couch-2',name:'Gauč 2',emoji:'🛋️',type:'couch',meta:'u okna, city view 🌆',img:null},
@@ -273,7 +273,7 @@
     let state={spot:null,activity:null,customRequest:'',date:null,time:null,duration:null,name:'',email:''};
     let calYear,calMonth,bookedSlots={};
     let supabase=null;
-    try{if(CONFIG.supabaseUrl!=='SUPABASE_URL_HERE')supabase=window.supabase.createClient(CONFIG.supabaseUrl,CONFIG.supabaseKey)}catch(e){}
+    try{if(CONFIG.supabaseUrl!=='https://pypusfkmlgvclrnsvtee.supabase.co')supabase=window.supabase.createClient(CONFIG.supabaseUrl,CONFIG.supabaseKey)}catch(e){}
 
     async function fetchBookedSlots(spotId,year,month){
       if(!supabase)return;
