@@ -766,9 +766,7 @@
       if (!state.spot || !state.activity || !state.date || !state.time || !state.duration || !state.name || !state.email) {
         showToast('vyplň všechno, bez toho to nepůjde 😤', 'error'); return;
       }
-      if (state.activity === 'other' && !state.customRequest.trim()) {
-        showToast('popiš svou tajnou misi 👀', 'error'); return;
-      }
+      // custom request is optional
       submitBooking();
     };
 
