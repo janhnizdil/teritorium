@@ -9,6 +9,7 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
   <link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,400;12..96,600;12..96,800&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet"/>
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@emailjs/browser@4/dist/email.min.js"></script>
   <style>
     :root {
       --bg: #080808;
@@ -413,6 +414,12 @@
     var SUPABASE_URL = 'https://pypusfkmlgvclrnsvtee.supabase.co';
     var SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InB5cHVzZmttbGd2Y2xybnN2dGVlIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzQ0MzExMTMsImV4cCI6MjA5MDAwNzExM30.y6Ff2CJ-8LxHNDMoCO8U1JVttUQlMJzrfZ6jmU8Zcic';
 
+    // EMAILJS
+    var EJS_SERVICE  = 'service_a99svvs';
+    var EJS_TEMPLATE = 'template_e9of0dd';
+    var EJS_KEY      = 'GltDbg0flFwSwhLQf';
+    emailjs.init(EJS_KEY);
+
     // DATA
     var SPOTS = [
       {id:'couch-1', name:'Gauč 1',              emoji:'🛋️', type:'couch',    meta:'Bruselská 14 — jen po setmění 🌙', img:'gauc1.jpeg', acts:['evening','other'], nightOnly:true},
@@ -479,13 +486,51 @@
         created_at: new Date().toISOString()
       };
 
-      function showSuccess() {
+      function sendEmail(booking) {
+        var spot = SPOTS.find(function(s) { return s.id === booking.spot_id; });
+        var act  = ACTIVITIES.find(function(a) { return a.id === booking.activity; });
+        var dur  = DURATIONS.find(function(d) { return d.value === booking.duration; });
+
+        // Google Calendar link
+        var calDate = booking.date.replace(/-/g,'');
+        var calStart = calDate + 'T' + booking.time.replace(':','') + '00';
+        var calEnd   = calDate + 'T' + booking.end_time.replace(':','') + '00';
+        var calTitle = encodeURIComponent('🔥 ' + (spot ? spot.name : booking.spot_id) + ' · teritorium');
+        var calLink  = 'https://calendar.google.com/calendar/render?action=TEMPLATE&text=' + calTitle
+          + '&dates=' + calStart + '/' + calEnd
+          + '&details=' + encodeURIComponent('ref: ' + booking.ref_id);
+
+        var params = {
+          to_name:       booking.name,
+          to_email:      booking.email,
+          ref_id:        booking.ref_id,
+          spot:          spot ? spot.emoji + ' ' + spot.name : booking.spot_id,
+          activity:      act  ? act.emoji  + ' ' + act.name  : booking.activity,
+          date:          booking.date,
+          time:          booking.time,
+          end_time:      booking.end_time,
+          duration:      dur  ? dur.label  : booking.duration + ' min',
+          calendar_link: calLink,
+        };
+
+        // Send to booker
+        emailjs.send(EJS_SERVICE, EJS_TEMPLATE, params);
+
+        // Also send copy to admin
+        emailjs.send(EJS_SERVICE, EJS_TEMPLATE, Object.assign({}, params, {
+          to_email: 'jan.hnizdil.cz@gmail.com',
+          to_name:  'Jan (admin)',
+        }));
+      }
+
+      function showSuccess(booking) {
         btn.classList.remove('loading');
         document.getElementById('success-ref-id').textContent = ref;
         var em = {sleep:'😴', evening:'🔥', combo:'🤪', other:'👀'};
         document.getElementById('success-emoji').textContent = em[state.activity] || '🔥';
         document.getElementById('main-screen').style.display = 'none';
         document.getElementById('success-screen').classList.add('visible');
+        sendEmail(booking);
       }
 
       if (sb) {
@@ -494,11 +539,11 @@
             showToast('chyba 😬 ' + res.error.message, 'error');
             btn.classList.remove('loading');
           } else {
-            showSuccess();
+            showSuccess(booking);
           }
         });
       } else {
-        showSuccess();
+        showSuccess(booking);
       }
     }
 
